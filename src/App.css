@@ -1,7 +1,5 @@
 .App {
   text-align: center;
-  background: #a6a6a914;
-  height: -webkit-fill-available;
 }
 
 .title {
@@ -11,6 +9,11 @@
 button.ui.primary.button {
   margin: 10px 0 0 10px;
   min-width: 12%;
+}
+
+.channel {
+  margin-top: 5px;
+  font-style: italic;
 }
 
 .ui.active.inline.loader {

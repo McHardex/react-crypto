@@ -9,7 +9,7 @@ export const getTradingPairs = async () => {
   }
 }
 
-export const subscribe = (client, value) => {
+export const subscribeToLiveOrderBook = (client, value) => {
   client.send(JSON.stringify({
     "event": "bts:subscribe",
     "data": {
@@ -18,7 +18,7 @@ export const subscribe = (client, value) => {
   }));
 }
 
-export const unsubscribe = (client, value) => {
+export const unsubscribeFromLiveOrderBook = (client, value) => {
   client.send(JSON.stringify({
     "event": "bts:unsubscribe",
     "data": {
