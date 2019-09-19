@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dropdown, Button, Loader } from 'semantic-ui-react';
-import { getTradingPairs, subscribe, unsubscribe } from './utils/services';
+import { getTradingPairs, subscribeToLiveOrderBook, unsubscribeFromLiveOrderBook } from './utils/services';
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import './App.css';
 
@@ -8,11 +8,12 @@ const client = new W3CWebSocket('wss://ws.bitstamp.net');
 
 class App extends React.Component {
   state = {
-    tradingPairs: [],
+    currencyPairs: [],
     value: '',
     orderBook: {},
     loadindOrderBook: false,
-    unsubscribed: false
+    unsubscribed: false,
+    channel: ''
   }
 
   UNSAFE_componentWillMount() {
@@ -26,22 +27,22 @@ class App extends React.Component {
 
   async componentDidMount() {
     const response = await getTradingPairs();
-    const name = response.data.map(pairs => {
+    const currencyPairs = response.data.map(pairs => {
       return {
         value: pairs.url_symbol,
         text: pairs.name
       }
     });
 
-    this.setState({ tradingPairs: name });
+    this.setState({ currencyPairs });
   }
 
   async componentDidUpdate(prevProps, prevState) {
     const { value } = this.state;
     if (prevState.value !== value) {
-      unsubscribe(client, prevState.value);
+      await unsubscribeFromLiveOrderBook(client, prevState.value);
 
-      subscribe(client, value);
+      await subscribeToLiveOrderBook(client, value);
 
       client.onmessage = (event) => {
         const { data } = event;
@@ -49,7 +50,8 @@ class App extends React.Component {
         if (Object.keys(res.data).length > 1) {
           this.setState({
             orderBook: res.data,
-            loadindOrderBook: false
+            loadindOrderBook: false,
+            channel: res.channel
           });
         }
       };
@@ -58,7 +60,7 @@ class App extends React.Component {
 
   subscribe = () => {
     const { value } = this.state;
-    subscribe(client, value);
+    subscribeToLiveOrderBook(client, value);
     this.setState({
       unsubscribed: false,
       loadindOrderBook: true
@@ -67,7 +69,7 @@ class App extends React.Component {
 
   unsubscribe = () => {
     const { value } = this.state;
-    unsubscribe(client, value);
+    unsubscribeFromLiveOrderBook(client, value);
     this.setState({ unsubscribed: true });
   }
 
@@ -102,11 +104,11 @@ class App extends React.Component {
   )
 
   render() {
-    const { tradingPairs, orderBook, loadindOrderBook, unsubscribed } = this.state;
+    const { currencyPairs, orderBook, loadindOrderBook, unsubscribed, channel } = this.state;
     return (
       <div className="App">
         <h1 className="title">React Crypto Order Book App</h1>
-        <Dropdown placeholder='Select currency pair' search selection options={tradingPairs} onChange={this.getDropdownValue} />
+        <Dropdown placeholder='Select currency pair' search selection options={currencyPairs} onChange={this.getDropdownValue} />
         {Object.keys(orderBook).length > 1 &&
           <Button
             primary
@@ -117,9 +119,8 @@ class App extends React.Component {
           </Button>
         }
         <div className="bids-ask-wrapper">
-          <div style={{ visibility: loadindOrderBook ? 'visible' : 'hidden' }}>
-            <Loader active inline />
-          </div>
+          <p className="channel">{channel.length > 1 && `Channel: ${channel}`}</p>
+          <Loader active inline style={{ visibility: loadindOrderBook ? 'visible' : 'hidden' }} />
           {Object.keys(orderBook).length > 1 ? this.renderBidsAndAsks(orderBook) : null}
         </div>
       </div>
