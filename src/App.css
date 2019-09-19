@@ -1,0 +1,52 @@
+.App {
+  text-align: center;
+  background: #a6a6a914;
+  height: -webkit-fill-available;
+}
+
+.title {
+  padding-top: 5vh !important;
+}
+
+button.ui.primary.button {
+  margin: 10px 0 0 10px;
+  min-width: 12%;
+}
+
+.ui.active.inline.loader {
+  margin-top: 10px;
+}
+
+.asks-bid {
+  display: flex;
+  min-width: 60%;
+  margin: 0 auto;
+  justify-content: space-around;
+}
+
+.bids-wrapper, .asks-wrapper {
+  width: 40%;
+}
+
+.bids-container, .asks-container {
+  width: fit-content;
+  margin: 10px auto;
+}
+
+.bids, .asks {
+  text-align: start;
+  font-weight: 500;
+}
+
+.bids-header, .asks-header {
+  background-color: #008000;
+  color: #fff;
+  padding: 5px 40px;
+  border-radius: 3px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.asks-header {
+  background-color: #ff0000;
+}
