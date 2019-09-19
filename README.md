@@ -28,14 +28,14 @@ List of libraries, tools, etc needed (e.g. npm, yarn, etc)
 
 ### Getting Started
 
-- Clone the repo - `git clone https://github.com/andela/travel_tool_front.git`
+- Clone the repo - `git clone https://github.com/McHardex/react-crypto.git`
 - Change into the project directory - `cd react-crypto`
 - Install project dependencies run `npm install`
 - Run the server `npm start` or `yarn start`
 
 ## Prototype
 
-The application is staged [here](https://travela-staging.andela.com/)
+The application is staged [here](https://crypro-order-book.netlify.com/)
 
 ## Deployment
 
