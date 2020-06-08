@@ -1,25 +1,29 @@
-import React from 'react';
-import { Dropdown, Button, Loader } from 'semantic-ui-react';
-import { getTradingPairs, subscribeToLiveOrderBook, unsubscribeFromLiveOrderBook } from './utils/services';
+import React from "react";
+import { Dropdown, Button, Loader } from "semantic-ui-react";
+import {
+  getTradingPairs,
+  subscribeToLiveOrderBook,
+  unsubscribeFromLiveOrderBook
+} from "./utils/services";
 import { w3cwebsocket as W3CWebSocket } from "websocket";
-import './App.css';
+import "./App.css";
 
-const client = new W3CWebSocket('wss://ws.bitstamp.net');
+const client = new W3CWebSocket("wss://ws.bitstamp.net");
 
 class App extends React.Component {
   state = {
     currencyPairs: [],
-    value: '',
+    value: "",
     orderBook: {},
     loadindOrderBook: false,
     unsubscribed: false,
-    channel: ''
-  }
+    channel: ""
+  };
 
   UNSAFE_componentWillMount() {
     client.onopen = () => {
-      console.log('WebSocket Client Connected');
-      client.onerror = (error) => {
+      console.log("WebSocket Client Connected");
+      client.onerror = error => {
         console.log("Connection Error: " + error.toString());
       };
     };
@@ -27,12 +31,14 @@ class App extends React.Component {
 
   async componentDidMount() {
     const response = await getTradingPairs();
-    const currencyPairs = response.data.map(pairs => {
-      return {
-        value: pairs.url_symbol,
-        text: pairs.name
-      }
-    });
+    const currencyPairs =
+      response &&
+      response.data.map(pairs => {
+        return {
+          value: pairs.url_symbol,
+          text: pairs.name
+        };
+      });
 
     this.setState({ currencyPairs });
   }
@@ -44,7 +50,7 @@ class App extends React.Component {
 
       await subscribeToLiveOrderBook(client, value);
 
-      client.onmessage = (event) => {
+      client.onmessage = event => {
         const { data } = event;
         const res = JSON.parse(data);
         if (Object.keys(res.data).length > 1) {
@@ -65,13 +71,13 @@ class App extends React.Component {
       unsubscribed: false,
       loadindOrderBook: true
     });
-  }
+  };
 
   unsubscribe = () => {
     const { value } = this.state;
     unsubscribeFromLiveOrderBook(client, value);
     this.setState({ unsubscribed: true });
-  }
+  };
 
   getDropdownValue = (e, { value }) => {
     this.setState({
@@ -79,49 +85,77 @@ class App extends React.Component {
       loadindOrderBook: true,
       unsubscribed: false
     });
-  }
+  };
 
-  renderBidsAndAsks = (orderBook) => (
+  renderBidsAndAsks = orderBook => (
     <div className="asks-bid">
       <div className="bids-wrapper">
         <h2 className="bids-header">Bid</h2>
         <div className="bids-container">
-          {Object.keys(orderBook).length > 1 ? orderBook.bids.map(bid => (
-            <p key={bid} className="bids">{bid}</p>
-          )) : null}
+          {Object.keys(orderBook).length > 1
+            ? orderBook.bids.map(bid => (
+                <p key={bid} className="bids">
+                  {bid}
+                </p>
+              ))
+            : null}
         </div>
       </div>
 
       <div className="asks-wrapper">
         <h2 className="asks-header">Ask</h2>
         <div className="asks-container">
-          {Object.keys(orderBook).length > 1 ? orderBook.asks.map(ask => (
-            <p key={ask} className="asks">{ask}</p>
-          )) : null}
+          {Object.keys(orderBook).length > 1
+            ? orderBook.asks.map(ask => (
+                <p key={ask} className="asks">
+                  {ask}
+                </p>
+              ))
+            : null}
         </div>
       </div>
     </div>
-  )
+  );
 
   render() {
-    const { currencyPairs, orderBook, loadindOrderBook, unsubscribed, channel } = this.state;
+    const {
+      currencyPairs,
+      orderBook,
+      loadindOrderBook,
+      unsubscribed,
+      channel
+    } = this.state;
     return (
       <div className="App">
         <h1 className="title">React Crypto Order Book App</h1>
-        <Dropdown placeholder='Select currency pair' search selection options={currencyPairs} onChange={this.getDropdownValue} />
-        {Object.keys(orderBook).length > 1 &&
+        <Dropdown
+          placeholder="Select currency pair"
+          search
+          selection
+          options={currencyPairs}
+          onChange={this.getDropdownValue}
+        />
+        {Object.keys(orderBook).length > 1 && (
           <Button
             primary
             onClick={unsubscribed ? this.subscribe : this.unsubscribe}
             disabled={Object.keys(orderBook).length < 1}
           >
-            {unsubscribed ? 'Subscribe' : 'Unsubscribe'}
+            {unsubscribed ? "Subscribe" : "Unsubscribe"}
           </Button>
-        }
+        )}
         <div className="bids-ask-wrapper">
-          <p className="channel">{channel.length > 1 && `Channel: ${channel}`}</p>
-          <Loader active inline style={{ visibility: loadindOrderBook ? 'visible' : 'hidden' }} />
-          {Object.keys(orderBook).length > 1 ? this.renderBidsAndAsks(orderBook) : null}
+          <p className="channel">
+            {channel.length > 1 && `Channel: ${channel}`}
+          </p>
+          <Loader
+            active
+            inline
+            style={{ visibility: loadindOrderBook ? "visible" : "hidden" }}
+          />
+          {Object.keys(orderBook).length > 1
+            ? this.renderBidsAndAsks(orderBook)
+            : null}
         </div>
       </div>
     );
