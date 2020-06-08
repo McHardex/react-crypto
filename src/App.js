@@ -27,7 +27,7 @@ class App extends React.Component {
 
   async componentDidMount() {
     const response = await getTradingPairs();
-    const currencyPairs = response.data.map(pairs => {
+    const currencyPairs = response && response.data.map(pairs => {
       return {
         value: pairs.url_symbol,
         text: pairs.name
